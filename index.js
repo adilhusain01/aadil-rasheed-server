@@ -24,10 +24,9 @@ const corsOptions = {
   origin: function (origin, callback) {
     const allowedOrigins = [
       'http://localhost:3000',
-      'https://localhost:3000',
-      'https://aadil-rasheed.vercel.app',
-      'https://aadilrasheed.adilhusain.me',
-      'https://adilrasheed.com'
+      'https://aadilrasheed.vercel.app',
+      'https://aadilrasheed.com',
+      'https://aadilrasheed.in'
     ];
     
     // Allow requests with no origin (like mobile apps, curl, Postman)
