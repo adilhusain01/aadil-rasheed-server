@@ -1,21 +1,23 @@
-const BlogPost = require('../models/BlogPost');
+const BlogPost = require("../models/BlogPost");
 
 // @desc    Get all blog posts
 // @route   GET /api/blog
 // @access  Public
 exports.getBlogPosts = async (req, res) => {
   try {
-    const blogPosts = await BlogPost.find({ isPublished: true }).sort('-createdAt');
-    
+    const blogPosts = await BlogPost.find({ isPublished: true }).sort(
+      "-createdAt"
+    );
+
     res.status(200).json({
       success: true,
       count: blogPosts.length,
-      data: blogPosts
+      data: blogPosts,
     });
   } catch (error) {
     res.status(500).json({
       success: false,
-      error: 'Server Error'
+      error: "Server Error",
     });
   }
 };
@@ -25,26 +27,26 @@ exports.getBlogPosts = async (req, res) => {
 // @access  Public
 exports.getBlogPostBySlug = async (req, res) => {
   try {
-    const blogPost = await BlogPost.findOne({ 
+    const blogPost = await BlogPost.findOne({
       slug: req.params.slug,
-      isPublished: true 
+      isPublished: true,
     });
 
     if (!blogPost) {
       return res.status(404).json({
         success: false,
-        error: 'Blog post not found'
+        error: "Blog post not found",
       });
     }
 
     res.status(200).json({
       success: true,
-      data: blogPost
+      data: blogPost,
     });
   } catch (error) {
     res.status(500).json({
       success: false,
-      error: 'Server Error'
+      error: "Server Error",
     });
   }
 };
@@ -59,18 +61,18 @@ exports.getBlogPostById = async (req, res) => {
     if (!blogPost) {
       return res.status(404).json({
         success: false,
-        error: 'Blog post not found'
+        error: "Blog post not found",
       });
     }
 
     res.status(200).json({
       success: true,
-      data: blogPost
+      data: blogPost,
     });
   } catch (error) {
     res.status(500).json({
       success: false,
-      error: 'Server Error'
+      error: "Server Error",
     });
   }
 };
@@ -84,20 +86,20 @@ exports.createBlogPost = async (req, res) => {
 
     res.status(201).json({
       success: true,
-      data: blogPost
+      data: blogPost,
     });
   } catch (error) {
-    if (error.name === 'ValidationError') {
-      const messages = Object.values(error.errors).map(val => val.message);
-      
+    if (error.name === "ValidationError") {
+      const messages = Object.values(error.errors).map((val) => val.message);
+
       return res.status(400).json({
         success: false,
-        error: messages
+        error: messages,
       });
     } else {
       return res.status(500).json({
         success: false,
-        error: 'Server Error'
+        error: "Server Error",
       });
     }
   }
@@ -113,31 +115,31 @@ exports.updateBlogPost = async (req, res) => {
     if (!blogPost) {
       return res.status(404).json({
         success: false,
-        error: 'Blog post not found'
+        error: "Blog post not found",
       });
     }
 
     blogPost = await BlogPost.findByIdAndUpdate(req.params.id, req.body, {
       new: true,
-      runValidators: true
+      runValidators: true,
     });
 
     res.status(200).json({
       success: true,
-      data: blogPost
+      data: blogPost,
     });
   } catch (error) {
-    if (error.name === 'ValidationError') {
-      const messages = Object.values(error.errors).map(val => val.message);
-      
+    if (error.name === "ValidationError") {
+      const messages = Object.values(error.errors).map((val) => val.message);
+
       return res.status(400).json({
         success: false,
-        error: messages
+        error: messages,
       });
     } else {
       return res.status(500).json({
         success: false,
-        error: 'Server Error'
+        error: "Server Error",
       });
     }
   }
@@ -153,7 +155,7 @@ exports.deleteBlogPost = async (req, res) => {
     if (!blogPost) {
       return res.status(404).json({
         success: false,
-        error: 'Blog post not found'
+        error: "Blog post not found",
       });
     }
 
@@ -161,12 +163,12 @@ exports.deleteBlogPost = async (req, res) => {
 
     res.status(200).json({
       success: true,
-      data: {}
+      data: {},
     });
   } catch (error) {
     return res.status(500).json({
       success: false,
-      error: 'Server Error'
+      error: "Server Error",
     });
   }
 };
@@ -177,26 +179,26 @@ exports.deleteBlogPost = async (req, res) => {
 exports.likeBlogPost = async (req, res) => {
   try {
     const blogPost = await BlogPost.findById(req.params.id);
-    
+
     if (!blogPost) {
       return res.status(404).json({
         success: false,
-        error: 'Blog post not found'
+        error: "Blog post not found",
       });
     }
-    
+
     // Increment likes count
     blogPost.likes += 1;
     await blogPost.save();
-    
+
     res.status(200).json({
       success: true,
-      data: blogPost
+      data: blogPost,
     });
   } catch (error) {
     res.status(500).json({
       success: false,
-      error: 'Server Error'
+      error: "Server Error",
     });
   }
 };
@@ -206,23 +208,23 @@ exports.likeBlogPost = async (req, res) => {
 // @access  Private
 exports.getAllBlogPostsAdmin = async (req, res) => {
   try {
-    const blogPosts = await BlogPost.find().sort('-createdAt');
-    
+    const blogPosts = await BlogPost.find().sort("-createdAt");
+
     // Count published and unpublished posts
-    const publishedPosts = blogPosts.filter(post => post.isPublished).length;
+    const publishedPosts = blogPosts.filter((post) => post.isPublished).length;
     const unpublishedPosts = blogPosts.length - publishedPosts;
-    
+
     res.status(200).json({
       success: true,
       count: blogPosts.length,
       publishedCount: publishedPosts,
       unpublishedCount: unpublishedPosts,
-      data: blogPosts
+      data: blogPosts,
     });
   } catch (error) {
     res.status(500).json({
       success: false,
-      error: 'Server Error'
+      error: "Server Error",
     });
   }
 };

@@ -103,7 +103,9 @@ exports.getMe = async (req, res) => {
 exports.logout = async (req, res) => {
   res.cookie('token', 'none', {
     expires: new Date(Date.now() + 10 * 1000),
-    httpOnly: true
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'none'
   });
 
   res.status(200).json({
@@ -132,14 +134,14 @@ const sendTokenResponse = (user, statusCode, res) => {
   
   const options = {
     expires: new Date(Date.now() + expiresIn * 24 * 60 * 60 * 1000),
-    httpOnly: true
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'none',
+    path: '/'
   };
-  
-  if (process.env.NODE_ENV === 'production') {
-    options.secure = true;
-  }
 
   console.log(`Status: ${statusCode}, Token generated, Expires in: ${expiresIn} days`);
+  console.log(`Cookie options:`, JSON.stringify(options));
 
   res
     .status(statusCode)

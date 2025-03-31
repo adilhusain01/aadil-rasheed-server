@@ -18,11 +18,71 @@ const app = express();
 
 // Middleware
 app.use(express.json());
-app.use(cors({
-  origin: process.env.CLIENT_URL || 'http://localhost:3000',
-  credentials: true
-}));
+
+// CORS configuration
+const corsOptions = {
+  origin: function (origin, callback) {
+    const allowedOrigins = [
+      'http://localhost:3000',
+      'https://localhost:3000',
+      'https://aadil-rasheed.vercel.app',
+      'https://aadilrasheed.adilhusain.me',
+      'https://adilrasheed.com'
+    ];
+    
+    // Allow requests with no origin (like mobile apps, curl, Postman)
+    if (!origin) return callback(null, true);
+    
+    console.log('Incoming request from origin:', origin);
+    
+    if (allowedOrigins.indexOf(origin) !== -1 || process.env.NODE_ENV !== 'production') {
+      callback(null, true);
+    } else {
+      console.log('Origin not allowed by CORS:', origin);
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept', 'Origin'],
+  exposedHeaders: ['Set-Cookie'],
+  optionsSuccessStatus: 200
+};
+
+app.use(cors(corsOptions));
+
+// Configure cookie parser with secure settings
 app.use(cookieParser());
+
+// Add cookie settings middleware
+app.use((req, res, next) => {
+  // Set secure cookie options
+  res.cookie = function(name, value, options = {}) {
+    const defaultOptions = {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'none', // Required for cross-site cookies
+      maxAge: 24 * 60 * 60 * 1000 // 1 day
+    };
+    
+    // Call the original cookie function with merged options
+    return require('express/lib/response').cookie.call(
+      this, 
+      name, 
+      value, 
+      { ...defaultOptions, ...options }
+    );
+  };
+  
+  next();
+});
+
+// Log all requests for debugging
+app.use((req, res, next) => {
+  console.log(`[${new Date().toISOString()}] ${req.method} ${req.url}`);
+  console.log('Headers:', JSON.stringify(req.headers));
+  next();
+});
 
 // Morgan HTTP request logger
 app.use(morgan('combined', { stream: logger.stream }));
