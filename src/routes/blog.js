@@ -6,7 +6,8 @@ const {
   createBlogPost,
   updateBlogPost,
   deleteBlogPost,
-  likeBlogPost
+  likeBlogPost,
+  getAllBlogPostsAdmin
 } = require('../controllers/blogController');
 const { protect } = require('../middleware/auth');
 
@@ -30,5 +31,9 @@ router
 router
   .route('/:id/like')
   .put(likeBlogPost);
+
+router
+  .route('/admin/all')
+  .get(protect, getAllBlogPostsAdmin);
 
 module.exports = router;

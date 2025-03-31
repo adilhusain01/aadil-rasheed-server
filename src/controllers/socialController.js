@@ -20,6 +20,32 @@ exports.getSocialMediaLinks = async (req, res) => {
   }
 };
 
+// @desc    Get all social media links (including inactive) for admin
+// @route   GET /api/social/admin/all
+// @access  Private
+exports.getAllSocialMediaLinksAdmin = async (req, res) => {
+  try {
+    const socialLinks = await SocialMedia.find().sort('displayOrder');
+    
+    // Count active and inactive links
+    const activeLinks = socialLinks.filter(link => link.isActive).length;
+    const inactiveLinks = socialLinks.length - activeLinks;
+    
+    res.status(200).json({
+      success: true,
+      count: socialLinks.length,
+      activeCount: activeLinks,
+      inactiveCount: inactiveLinks,
+      data: socialLinks
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      error: 'Server Error'
+    });
+  }
+};
+
 // @desc    Create new social media link
 // @route   POST /api/social
 // @access  Private

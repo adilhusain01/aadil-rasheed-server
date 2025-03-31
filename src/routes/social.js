@@ -3,19 +3,25 @@ const {
   getSocialMediaLinks,
   createSocialMediaLink,
   updateSocialMediaLink,
-  deleteSocialMediaLink
+  deleteSocialMediaLink,
+  getAllSocialMediaLinksAdmin
 } = require('../controllers/socialController');
+const { protect } = require('../middleware/auth');
 
 const router = express.Router();
 
 router
   .route('/')
   .get(getSocialMediaLinks)
-  .post(createSocialMediaLink);
+  .post(protect, createSocialMediaLink);
 
 router
   .route('/:id')
-  .put(updateSocialMediaLink)
-  .delete(deleteSocialMediaLink);
+  .put(protect, updateSocialMediaLink)
+  .delete(protect, deleteSocialMediaLink);
+
+router
+  .route('/admin/all')
+  .get(protect, getAllSocialMediaLinksAdmin);
 
 module.exports = router;

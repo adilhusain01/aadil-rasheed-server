@@ -177,23 +177,50 @@ exports.deleteBlogPost = async (req, res) => {
 exports.likeBlogPost = async (req, res) => {
   try {
     const blogPost = await BlogPost.findById(req.params.id);
-
+    
     if (!blogPost) {
       return res.status(404).json({
         success: false,
         error: 'Blog post not found'
       });
     }
-
+    
+    // Increment likes count
     blogPost.likes += 1;
     await blogPost.save();
-
+    
     res.status(200).json({
       success: true,
       data: blogPost
     });
   } catch (error) {
-    return res.status(500).json({
+    res.status(500).json({
+      success: false,
+      error: 'Server Error'
+    });
+  }
+};
+
+// @desc    Get all blog posts for admin dashboard
+// @route   GET /api/blog/admin/all
+// @access  Private
+exports.getAllBlogPostsAdmin = async (req, res) => {
+  try {
+    const blogPosts = await BlogPost.find().sort('-createdAt');
+    
+    // Count published and unpublished posts
+    const publishedPosts = blogPosts.filter(post => post.isPublished).length;
+    const unpublishedPosts = blogPosts.length - publishedPosts;
+    
+    res.status(200).json({
+      success: true,
+      count: blogPosts.length,
+      publishedCount: publishedPosts,
+      unpublishedCount: unpublishedPosts,
+      data: blogPosts
+    });
+  } catch (error) {
+    res.status(500).json({
       success: false,
       error: 'Server Error'
     });
